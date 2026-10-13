@@ -6,12 +6,11 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from app.api.deps import get_current_admin, get_current_user_optional
 from app.core.database import get_db
-from app.models.bathroom import Bathroom, BathroomExtra
+from app.models.bathroom import Bathroom
 from app.models.payment import Payment
 from app.models.reservation import Reservation
 from app.models.user import User

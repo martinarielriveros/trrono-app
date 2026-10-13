@@ -51,8 +51,7 @@ def upgrade() -> None:
         sa.Column("total_price", sa.Numeric(precision=10, scale=2), nullable=False),
         sa.Column(
             "selected_extras",
-            postgresql.JSONB(astext_type=sa.Text())
-            .with_variant(sa.JSON(), "sqlite"),
+            postgresql.JSONB(astext_type=sa.Text()).with_variant(sa.JSON(), "sqlite"),
             nullable=False,
             server_default="[]",
         ),
@@ -121,8 +120,7 @@ def upgrade() -> None:
         sa.Column("net_vendor_amount", sa.Numeric(precision=10, scale=2), nullable=False),
         sa.Column(
             "raw_payload",
-            postgresql.JSONB(astext_type=sa.Text())
-            .with_variant(sa.JSON(), "sqlite"),
+            postgresql.JSONB(astext_type=sa.Text()).with_variant(sa.JSON(), "sqlite"),
             nullable=True,
         ),
         sa.Column(

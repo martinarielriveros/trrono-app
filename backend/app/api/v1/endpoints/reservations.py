@@ -10,13 +10,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.api.deps import (
-    get_current_user,
     get_current_user_optional,
     get_current_vendor,
 )
 from app.core.database import get_db
 from app.core.security import get_password_hash
-from app.models.bathroom import Bathroom, BathroomExtra
+from app.models.bathroom import Bathroom
 from app.models.reservation import Reservation
 from app.models.user import User
 from app.schemas.reservation import (

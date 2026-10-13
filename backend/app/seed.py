@@ -159,7 +159,8 @@ def run_seed() -> None:
                 "title": "Café Peatonal San Martín - Confort y Accesibilidad",
                 "description": (
                     "Baño impecable en pleno centro comercial y peatonal de Santa Fe. "
-                    "Limpieza permanente tras cada turno, espejo amplio y adaptado para movilidad reducida."
+                    "Limpieza permanente tras cada turno, espejo amplio "
+                    "y adaptado para movilidad reducida."
                 ),
                 "address": "San Martín 2340",
                 "city": "Santa Fe",
@@ -188,7 +189,8 @@ def run_seed() -> None:
                 "title": "Parador Costanera Setúbal - Ducha y Vestuario Deportivo",
                 "description": (
                     "Frente a la Laguna Setúbal y el histórico Puente Colgante de Santa Fe. "
-                    "Ideal para corredores y deportistas: ducha con agua caliente y vestuario sanitizado."
+                    "Ideal para corredores y deportistas: ducha con agua caliente "
+                    "y vestuario sanitizado."
                 ),
                 "address": "Av. 7 de Jefes 3680",
                 "city": "Santa Fe",
