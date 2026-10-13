@@ -151,6 +151,8 @@ activemq-data/
 
 # Environments
 .env
+.env.*
+!.env.example
 .envrc
 .venv
 env/
@@ -158,6 +160,18 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.npm
+.eslintcache
+.stylelintcache
+coverage/
+.turbo
+
 
 # Spyder project settings
 .spyderproject

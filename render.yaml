@@ -1,0 +1,99 @@
+# ==============================================================================
+# TRONNO - Render Blueprint Infrastructure (render.yaml)
+# Hosting: Web Service (Backend FastAPI) + Static Site (Frontend React Vite PWA)
+# Ambientes: Staging (branch develop) y Producción (branch main)
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # BACKEND: FastAPI Python Web Service
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: tronno-backend
+    runtime: python
+    region: ohio
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    preDeployCommand: alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: false # Se activa automáticamente tras pasar checks de GitHub Actions
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false # Suministrada desde Neon (rama production o staging)
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+      - key: TIMEZONE
+        value: America/Argentina/Buenos_Aires
+      - key: PAYMENTS_MODE
+        value: live
+      - key: MERCADO_PAGO_ACCESS_TOKEN
+        sync: false
+      - key: MERCADO_PAGO_PUBLIC_KEY
+        sync: false
+      - key: MERCADO_PAGO_WEBHOOK_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: ADMIN_EMAIL
+        value: admin@tronno.com.ar
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: EMAILS_TO_CONSOLE
+        value: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: EMAILS_FROM
+        value: hola@tronno.com.ar
+      - key: FRONTEND_URL
+        fromStaticSite:
+          name: tronno-frontend
+          property: url
+
+  # ----------------------------------------------------------------------------
+  # FRONTEND: Vite React PWA Static Site
+  # ----------------------------------------------------------------------------
+  - type: static
+    name: tronno-frontend
+    region: ohio
+    plan: starter
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    autoDeploy: false # Se activa tras pasar GitHub Actions
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: tronno-backend
+          property: host
+          path: /api/v1

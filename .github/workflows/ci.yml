@@ -1,0 +1,99 @@
+name: Tronno CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  backend-checks:
+    name: Backend Lint & Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: tronno_user
+          POSTGRES_PASSWORD: tronno_password
+          POSTGRES_DB: tronno_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint with ruff
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Run Alembic migrations on PostGIS
+        env:
+          DATABASE_URL: postgresql+psycopg://tronno_user:tronno_password@localhost:5432/tronno_db
+          SECRET_KEY: test_secret_key_for_ci_pipeline_min_32_characters_123
+        run: |
+          alembic upgrade head
+
+      - name: Run backend tests with pytest
+        env:
+          DATABASE_URL: postgresql+psycopg://tronno_user:tronno_password@localhost:5432/tronno_db
+          SECRET_KEY: test_secret_key_for_ci_pipeline_min_32_characters_123
+          PAYMENTS_MODE: mock
+        run: |
+          pytest -v
+
+  frontend-checks:
+    name: Frontend Lint, Typecheck & Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build production bundle
+        run: npm run build
